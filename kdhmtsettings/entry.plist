@@ -1,0 +1,10 @@
+{
+    entry = {
+	bundle = kdhmtsettings;
+	cell = PSLinkCell;
+	detail = kdhmtsettingsListController;
+	icon = kdhmtsettings.png;
+	isController = 1;
+	label = kdhmtsettings;
+    };
+}
