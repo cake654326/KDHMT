@@ -55,7 +55,7 @@ static void callBack(CFNotificationCenterRef center, void *observer, CFStringRef
 
 // %end
 
-NSString *location = @"无法定位";
+NSString *location = @"无法获取归属地信息";
 NSString *NumRecognize = @"无法识别";
 UILabel *InComingNumRecognize = nil;
 UILabel *InCominglabel = nil;
@@ -65,8 +65,8 @@ UILabel *InCominglabel = nil;
     %orig;
     if (![InComingNum isEqualToString:@""] && status == 4 )
     {
-        
-        UIView *_awayView = [self view];
+        //UIViewController *_awayView = [objc_getClass("PHCallParticipantsViewController") sharedInstance];
+        UIView *_awayView = MSHookIvar<UIView *>(self, "_participantsView");
 
         float w = 200;
         float h = 100;
@@ -107,26 +107,29 @@ UILabel *InCominglabel = nil;
                                         // //将请求的url数据放到NSData对象中
                                         // NSData *response = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
                                         //IOS5自带解析类NSJSONSerialization从response中解析出数据放到字典中
-                                        NSLog(@"测试数据1--》%@", strRet );
+                                        NSLog(@"360测试数据1--》%@", strRet );
                                         strRet = [strRet stringByReplacingOccurrencesOfString :@"__" withString:@""];
                                         strRet = [strRet stringByReplacingOccurrencesOfString :@"_ =" withString:@":"];
-                                        NSLog(@"测试数据2--》%@", strRet );
+                                        NSLog(@"360测试数据2--》%@", strRet );
                                         NSData* jsonData = [strRet dataUsingEncoding:NSUTF8StringEncoding]; 
                                         NSDictionary *weatherDic = [NSJSONSerialization JSONObjectWithData:jsonData options:NSJSONReadingMutableLeaves error:&error];
                                         NSDictionary *weatherInfo = [weatherDic objectForKey:@"data"];
-                                        NSString *GetLocationErrorCode = [weatherDic objectForKey:@"code"];
-                                        NSString *location = @"无法获取归属地信息%@";
+                                        NSString *GetLocationErrorCode = [[weatherDic objectForKey:@"code"] stringValue];
 
-                                        // if ([GetLocationErrorCode isEqualToString:@"0"])
-                                        // {
+                                        if ([GetLocationErrorCode isEqualToString:@"0"])
+                                        {
                                             location = [NSString stringWithFormat:@"%@%@%@",[weatherInfo objectForKey:@"province"],[weatherInfo objectForKey:@"city"],[weatherInfo objectForKey:@"sp"]];
-                                            NSLog(@"weatherInfo字典里面的内容为--》%@", weatherDic );
+                                            NSLog(@"360weatherInfo字典里面的内容为--》%@", weatherDic );
+                                            if ([location isEqualToString:@"0"])
+                                            {
+                                                location = @"无法获取归属地信息";
+                                            }
 
                                            //NSString *responseString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
                                            NSLog(@"360==========================#################来电号码为：%@，归属地为：%@",InComingNum,location);
                                            //NSLog(@"HttpResponseCode:%d", responseCode);
                                            //NSLog(@"HttpResponseBody %@",responseString);
-                                        // }
+                                        }
 
                                         dispatch_async(dispatch_get_main_queue(), ^{
                                             InCominglabel.text = location;
@@ -161,10 +164,10 @@ UILabel *InCominglabel = nil;
                                         // //将请求的url数据放到NSData对象中
                                         // NSData *response = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
                                         //IOS5自带解析类NSJSONSerialization从response中解析出数据放到字典中
-                                        NSLog(@"###测试数据1--》%@", strRet1 );
+                                        NSLog(@"sogou###测试数据1--》%@", strRet1 );
                                         strRet1 = [strRet1 stringByReplacingOccurrencesOfString :@"show(" withString:@"{\"show\":"];
                                         strRet1 = [strRet1 stringByReplacingOccurrencesOfString :@")" withString:@"}"];
-                                        NSLog(@"###测试数据2--》%@", strRet1 );
+                                        NSLog(@"sogou###测试数据2--》%@", strRet1 );
                                         NSData* jsonData = [strRet1 dataUsingEncoding:NSUTF8StringEncoding]; 
                                         NSDictionary *weatherDic = [NSJSONSerialization JSONObjectWithData:jsonData options:NSJSONReadingMutableLeaves error:&error];
                                         NSDictionary *weatherInfo = [weatherDic objectForKey:@"show"];
@@ -176,7 +179,7 @@ UILabel *InCominglabel = nil;
                                         else{
                                             NumRecognize = [NSString stringWithFormat:@"%@",[weatherInfo objectForKey:@"NumInfo"]];
                                         }
-                                        NSLog(@"###weatherInfo字典里面的内容为--》%@", weatherDic );
+                                        NSLog(@"sogou###weatherInfo字典里面的内容为--》%@", weatherDic );
 
                                        //NSString *responseString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
                                        NSLog(@"sogou###==========================#################来电号码为：%@，识别信息为：%@",InComingNum,NumRecognize);
@@ -185,8 +188,6 @@ UILabel *InCominglabel = nil;
 
                                         dispatch_async(dispatch_get_main_queue(), ^{
                                             InComingNumRecognize.text = NumRecognize;
-                                            
-
                                         });
                                         
                                    }
